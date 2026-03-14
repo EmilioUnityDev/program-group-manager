@@ -6,11 +6,19 @@ Usage
     py -3.12 main.py
 """
 
+import logging
 import sys
 
-from PyQt6.QtWidgets import QApplication
-from PyQt6.QtGui import QFont, QPalette, QColor
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QFont, QPalette, QColor
+from PyQt6.QtWidgets import QApplication
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s  %(levelname)-8s  %(name)s: %(message)s",
+    datefmt="%H:%M:%S",
+    stream=sys.stderr,
+)
 
 from ui.main_window import MainWindow
 
