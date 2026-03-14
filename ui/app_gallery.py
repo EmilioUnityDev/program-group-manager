@@ -19,6 +19,7 @@ from PyQt6.QtWidgets import (
 
 from core.scanner import AppInfo
 from ui.app_card import AppCard
+from core.launcher import make_uwp_identifier
 
 COLS = 7          # default columns; adapts on resize
 CARD_SPACING = 8
@@ -89,10 +90,15 @@ class AppGallery(QWidget):
         selected_set = {p.lower() for p in (selected_paths or [])}
 
         for i, app in enumerate(apps):
-            is_selected = app.exe_path.lower() in selected_set
+            # Unified identifier: "uwp:{app_id}" for UWP, exe_path for Win32
+            identifier = (
+                make_uwp_identifier(app.app_id) if app.is_uwp
+                else app.exe_path
+            )
+            is_selected = identifier.lower() in selected_set
             card = AppCard(
                 name=app.name,
-                exe_path=app.exe_path,
+                exe_path=identifier,   # stored as the group identifier
                 pixmap=app.pixmap,
                 selected=is_selected,
             )
@@ -143,7 +149,7 @@ class AppGallery(QWidget):
         """Re-insert cards into the grid with the updated column count."""
         cards = self._cards[:]
         while self._grid.count():
-            item = self._grid.takeAt(0)
+            self._grid.takeAt(0)
             # Don't delete – just remove from layout
         for i, card in enumerate(cards):
             row, col = divmod(i, self._cols)
